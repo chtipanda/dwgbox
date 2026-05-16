@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.svg">
 <title>DwgBox — Générateur Boîte CNC</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,Arial,sans-serif;font-size:14px;background:#f5f4f0;color:#1a1a18;line-height:1.5}
@@ -46,13 +47,30 @@ canvas{border:1px solid #ddd;border-radius:6px;background:#f9f8f5;display:block;
 .tab{padding:5px 14px;border:1px solid #ccc;border-radius:5px;font-size:13px;cursor:pointer;background:#f5f4f0;color:#555;user-select:none;transition:all .15s}
 .tab:hover{background:#eee}
 .tab.on{background:#fff;color:#185FA5;border-color:#185FA5;font-weight:600}
-.dout{font-family:'Courier New',monospace;font-size:10px;background:#1a1e1a;color:#90d090;border:1px solid #333;border-radius:5px;padding:10px;max-height:190px;overflow-y:auto;white-space:pre;margin-top:6px;line-height:1.4}
+.dout{font-family:'Courier New',monospace;font-size:10px;background:#1a1e1a;color:#90d090;border:1px solid #333;border-radius:5px;padding:10px;max-height:190px;overflow-y:auto;white-space:pre;margin-bottom:10px}
 .btnr{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 button{padding:7px 16px;border:1px solid #ccc;border-radius:5px;background:#f5f4f0;color:#1a1a18;font-size:13px;cursor:pointer;font-weight:500;transition:all .15s}
 button:hover{background:#e8e6e0}
 button.p{border-color:#185FA5;color:#fff;background:#185FA5}
 button.p:hover{background:#0C447C}
-.notice{font-family:'Courier New',monospace;font-size:11px;line-height:1.7;color:#333;background:#f9f8f5;border:1px solid #ddd;border-radius:5px;padding:12px;max-height:280px;overflow-y:auto;white-space:pre;margin-top:6px}
+button.s{border-color:#0C447C;color:#fff;background:#0C447C}
+button.s:hover{background:#053354}
+.notice{font-family:'Courier New',monospace;font-size:11px;line-height:1.7;color:#333;background:#f9f8f5;border:1px solid #ddd;border-radius:5px;padding:12px;max-height:280px;overflow-y:auto;white-space:pre-wrap;margin-bottom:10px}
+/* Modal styles */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-content{background:#fff;border-radius:8px;padding:24px;max-width:500px;width:90%;box-shadow:0 4px 12px rgba(0,0,0,.3);max-height:80vh;overflow-y:auto}
+.modal-header{font-size:16px;font-weight:600;margin-bottom:16px;color:#1a1a18}
+.modal-body{margin-bottom:16px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end}
+.modal-input{width:100%;padding:8px 12px;border:1px solid #ccc;border-radius:5px;margin-bottom:12px;font-size:13px}
+.projects-list{max-height:300px;overflow-y:auto}
+.project-item{padding:12px;border:1px solid #e0dfd8;border-radius:5px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;background:#f9f8f5}
+.project-info{flex:1}
+.project-name{font-weight:600;color:#1a1a18}
+.project-date{font-size:11px;color:#999;margin-top:3px}
+.project-actions{display:flex;gap:6px}
+.project-actions button{padding:4px 8px;font-size:12px}
 @media(max-width:700px){
   .layout{grid-template-columns:1fr;height:auto}
   .panel{border-right:none;border-bottom:1px solid #ddd}
@@ -63,13 +81,23 @@ button.p:hover{background:#0C447C}
 </head>
 <body>
 <header>
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="4" fill="#fff3"/><path d="M6 22V8l8-4 8 4v14" stroke="#fff" stroke-width="1.5" fill="none"/><rect x="10" y="14" width="8" height="8" rx="1" fill="#fff5"/></svg>
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="2" width="24" height="24" rx="4" fill="#fff3"/><path d="M6 22V8l8-4 8 4v14" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="14" y1="8" x2="14" y2="22" stroke="#fff" stroke-width="1.5"/></svg>
   <h1>DwgBox <span>Générateur Boîte CNC — DXF Paramétrique</span></h1>
   <div id="offlineBadge">📶 Hors ligne</div>
 </header>
 
 <div class="layout">
 <div class="panel">
+
+  <div class="section">
+    <div class="stitle">Projets</div>
+    <div class="sbody">
+      <div class="btnr">
+        <button class="p" onclick="openSaveModal()">💾 Sauvegarder</button>
+        <button class="p" onclick="openLoadModal()">📂 Charger</button>
+      </div>
+    </div>
+  </div>
 
   <div class="section">
     <div class="stitle">Forme &amp; emboîtement</div>
@@ -164,7 +192,7 @@ button.p:hover{background:#0C447C}
   </div>
 
   <div class="section">
-    <div class="stitle">Export DXF</div>
+    <div class="stitle">Export DXF &amp; PDF</div>
     <div class="sbody">
       <div class="tabs">
         <div class="tab on" id="t-base" onclick="st('base')">Base</div>
@@ -191,10 +219,40 @@ button.p:hover{background:#0C447C}
         <div class="notice" id="notTxt"></div>
         <div class="btnr"><button onclick="cpNotice()">Copier la notice</button></div>
       </div>
+      <div style="margin-top:14px;border-top:1px solid #e0dfd8;padding-top:14px">
+        <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">📄 Exporter en PDF complet</div>
+        <button class="s" onclick="exportPDF()">📥 Générer PDF (données + DXF)</button>
+      </div>
     </div>
   </div>
 
 </div>
+</div>
+
+<!-- Modales -->
+<div class="modal" id="saveModal">
+  <div class="modal-content">
+    <div class="modal-header">💾 Sauvegarder un projet</div>
+    <div class="modal-body">
+      <input type="text" class="modal-input" id="projectName" placeholder="Nom du projet (ex: Boîte rangement)">
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeSaveModal()">Annuler</button>
+      <button class="p" onclick="saveProject()">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="loadModal">
+  <div class="modal-content">
+    <div class="modal-header">📂 Charger un projet</div>
+    <div class="modal-body">
+      <div class="projects-list" id="projectsList"></div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeLoadModal()">Fermer</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -208,7 +266,7 @@ window.addEventListener('online', ()=>{ document.getElementById('offlineBadge').
 window.addEventListener('offline',()=>{ document.getElementById('offlineBadge').style.display='block'; });
 if(!navigator.onLine) document.getElementById('offlineBadge').style.display='block';
 
-// ── App ───────────────────────────────────────────────────────────────────────
+// ── App ────────────────────────────────────────────────────────────────────────
 const IDS=['shape','fitType','dL','dW','dH','ratio','ep','bn','ct','cs','gW','gD','gap'];
 IDS.forEach(id=>document.getElementById(id).addEventListener('input',update));
 
@@ -353,9 +411,9 @@ function draw(id,p,isLid){
   ctx.fillText(isLid?'Couvercle':(p.shape==='rect'?`L=${p.L}  l=${p.W}`:`D/S=${p.L}`),ox+4,oy-6);
 }
 
-// ── DXF ──────────────────────────────────────────────────────────────────────
+// ── DXF ────────────────────────────────────────────────────────────────────────
 let dxfB='',dxfL='';
-function dxfHdr(t){return `999\nDwgBox ${t} - chtipanda.github.io/dwgbox\n  0\nSECTION\n  2\nHEADER\n  9\n$ACADVER\n  1\nAC1009\n  0\nENDSEC\n  0\nSECTION\n  2\nTABLES\n  0\nTABLE\n  2\nLAYER\n  0\nLAYER\n  2\nCONTOUR_EXT\n 70\n0\n 62\n7\n  6\nCONTINUOUS\n  0\nLAYER\n  2\nCAVITE_INT\n 70\n0\n 62\n3\n  6\nCONTINUOUS\n  0\nLAYER\n  2\nFOND_BALLNOSE\n 70\n0\n 62\n30\n  6\nCONTINUOUS\n  0\nLAYER\n  2\nRAINURE_EXT\n 70\n0\n 62\n4\n  6\nCONTINUOUS\n  0\nLAYER\n  2\nRAINURE_INT\n 70\n0\n 62\n1\n  6\nCONTINUOUS\n  0\nENDTAB\n  0\nENDSEC\n  0\nSECTION\n  2\nENTITIES\n`;}
+function dxfHdr(t){return `999\nDwgBox ${t} - chtipanda.github.io/dwgbox\n  0\nSECTION\n  2\nHEADER\n  9\n$ACADVER\n  1\nAC1009\n  0\nENDSEC\n  0\nSECTION\n  2\nTABLES\n  0\nTABLE\n  2\nLAYER\n  70\n   8\n  0\nLAYER\n  2\nCONTOUR_EXT\n 62\n    5\n  0\nLAYER\n  2\nCAVITE_INT\n 62\n    3\n  0\nLAYER\n  2\nFOND_BALLNOSE\n 62\n    7\n  0\nLAYER\n  2\nRAINURE_EXT\n 62\n    2\n  0\nLAYER\n  2\nRAINURE_INT\n 62\n    1\n  0\nENDTAB\n  0\nENDSEC\n  0\nSECTION\n  2\nBLOCKS\n  0\nENDSEC\n  0\nSECTION\n  2\nENTITIES\n`;}
 function dxfFtr(){return `  0\nENDSEC\n  0\nEOF\n`;}
 function Ln(x1,y1,x2,y2,l){return `  0\nLINE\n  8\n${l}\n 10\n${x1.toFixed(4)}\n 20\n${y1.toFixed(4)}\n 30\n0.0\n 11\n${x2.toFixed(4)}\n 21\n${y2.toFixed(4)}\n 31\n0.0\n`;}
 function Ar(cx,cy,r,a1,a2,l){return `  0\nARC\n  8\n${l}\n 10\n${cx.toFixed(4)}\n 20\n${cy.toFixed(4)}\n 30\n0.0\n 40\n${r.toFixed(4)}\n 50\n${a1.toFixed(4)}\n 51\n${a2.toFixed(4)}\n`;}
@@ -486,6 +544,170 @@ function cp(w){
 function cpNotice(){
   const t=document.getElementById('notTxt').textContent;
   navigator.clipboard.writeText(t).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
+}
+
+// ── Projets / Sauvegarde ────────────────────────────────────────────────────────
+function openSaveModal(){
+  document.getElementById('projectName').value='';
+  document.getElementById('saveModal').classList.add('show');
+  document.getElementById('projectName').focus();
+}
+function closeSaveModal(){
+  document.getElementById('saveModal').classList.remove('show');
+}
+function saveProject(){
+  const name=document.getElementById('projectName').value.trim();
+  if(!name){alert('Veuillez entrer un nom');return;}
+  const p=gp();
+  const projects=JSON.parse(localStorage.getItem('dwgbox_projects')||'{}');
+  const id=Date.now().toString();
+  projects[id]={name,params:p,date:new Date().toLocaleString('fr-FR')};
+  localStorage.setItem('dwgbox_projects',JSON.stringify(projects));
+  closeSaveModal();
+  alert('Projet "'+name+'" sauvegardé !');
+}
+function openLoadModal(){
+  const projects=JSON.parse(localStorage.getItem('dwgbox_projects')||'{}');
+  const list=document.getElementById('projectsList');
+  list.innerHTML='';
+  if(Object.keys(projects).length===0){
+    list.innerHTML='<p style="color:#999;text-align:center;padding:20px">Aucun projet sauvegardé</p>';
+  }else{
+    Object.entries(projects).forEach(([id,proj])=>{
+      const div=document.createElement('div');
+      div.className='project-item';
+      div.innerHTML=`
+        <div class="project-info">
+          <div class="project-name">${proj.name}</div>
+          <div class="project-date">${proj.date}</div>
+        </div>
+        <div class="project-actions">
+          <button onclick="loadProject('${id}')">Charger</button>
+          <button onclick="deleteProject('${id}')" style="border-color:#D85A30;color:#D85A30">Suppr.</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+  document.getElementById('loadModal').classList.add('show');
+}
+function closeLoadModal(){
+  document.getElementById('loadModal').classList.remove('show');
+}
+function loadProject(id){
+  const projects=JSON.parse(localStorage.getItem('dwgbox_projects')||'{}');
+  if(!projects[id])return;
+  const p=projects[id].params;
+  document.getElementById('shape').value=p.shape;
+  document.getElementById('fitType').value=p.fitType;
+  document.getElementById('dL').value=p.L;
+  document.getElementById('dW').value=p.W;
+  document.getElementById('dH').value=p.H;
+  document.getElementById('ratio').value=p.rat;
+  document.getElementById('ep').value=p.e;
+  document.getElementById('bn').value=p.bn;
+  document.getElementById('ct').value=p.ct;
+  document.getElementById('cs').value=p.cs;
+  document.getElementById('gW').value=p.gW;
+  document.getElementById('gD').value=p.gD;
+  document.getElementById('gap').value=p.gap;
+  closeLoadModal();
+  update();
+}
+function deleteProject(id){
+  if(!confirm('Supprimer ce projet ?'))return;
+  const projects=JSON.parse(localStorage.getItem('dwgbox_projects')||'{}');
+  delete projects[id];
+  localStorage.setItem('dwgbox_projects',JSON.stringify(projects));
+  openLoadModal();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeSaveModal();closeLoadModal();}
+});
+
+// ── Export PDF ──────────────────────────────────────────────────────────────────
+function exportPDF(){
+  const p=gp();
+  const tenonMur=+(p.e-p.gW-p.gap).toFixed(2);
+  const html=`
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        body{font-family:Arial,sans-serif;padding:20px;color:#333}
+        h1{color:#185FA5;border-bottom:2px solid #185FA5;padding-bottom:10px}
+        h2{color:#0C447C;margin-top:20px;font-size:14px}
+        table{width:100%;border-collapse:collapse;margin:10px 0}
+        td{padding:8px;border:1px solid #ddd}
+        .label{font-weight:600;background:#f0f4fa;width:40%}
+        .dxf{font-family:monospace;font-size:9px;background:#f5f5f5;border:1px solid #ddd;padding:10px;max-height:200px;overflow:hidden;page-break-inside:avoid;white-space:pre-wrap;word-wrap:break-word}
+        .warning{color:#854F0B;background:#FAEEDA;padding:8px;margin:10px 0;border-left:4px solid #EF9F27}
+        .pagebreak{page-break-after:always}
+      </style>
+    </head>
+    <body>
+      <h1>DwgBox — Rapport de Projet</h1>
+      <p><strong>Générateur paramétrique de boîtes CNC</strong> | chtipanda.github.io/dwgbox</p>
+      <p><strong>Date d'export :</strong> ${new Date().toLocaleString('fr-FR')}</p>
+      
+      <h2>Configuration du projet</h2>
+      <table>
+        <tr><td class="label">Forme</td><td>${p.shape==='rect'?'Rectangulaire':p.shape==='round'?'Ronde':'Hexagonale'}</td></tr>
+        <tr><td class="label">Emboîtement</td><td>${p.fitType==='overlay'?'Recouvrement':'Intérieur'}</td></tr>
+        <tr><td class="label">Longueur (L)</td><td>${p.L} mm</td></tr>
+        <tr><td class="label">Largeur (l)</td><td>${p.W} mm</td></tr>
+        <tr><td class="label">Hauteur (H)</td><td>${p.H} mm</td></tr>
+        <tr><td class="label">Épaisseur paroi</td><td>${p.e} mm</td></tr>
+        <tr><td class="label">Ball-nose</td><td>Ø${p.bn} mm (déport ${+(p.bn/2).toFixed(2)} mm)</td></tr>
+        <tr><td class="label">Fraise contour</td><td>Ø${p.ct} mm</td></tr>
+        <tr><td class="label">Côté découpe</td><td>${p.cs==='outside'?'Extérieur (G)':p.cs==='inside'?'Intérieur (D)':'Sur la ligne'}</td></tr>
+      </table>
+      
+      <h2>Rainure et jeu</h2>
+      <table>
+        <tr><td class="label">Largeur rainure</td><td>${p.gW} mm</td></tr>
+        <tr><td class="label">Profondeur rainure</td><td>${p.gD} mm</td></tr>
+        <tr><td class="label">Jeu fonctionnel</td><td>${p.gap} mm</td></tr>
+        <tr><td class="label">Reste ext. paroi</td><td>${+(p.e-p.gW).toFixed(2)} mm</td></tr>
+        <tr><td class="label">Épaisseur tenon</td><td>${tenonMur} mm</td></tr>
+      </table>
+      
+      <h2>Hauteurs</h2>
+      <table>
+        <tr><td class="label">Hauteur base</td><td>${p.hB} mm</td></tr>
+        <tr><td class="label">Hauteur couvercle</td><td>${p.hL} mm</td></tr>
+      </table>
+      
+      <div class="pagebreak"></div>
+      
+      <h2>Export DXF — BASE</h2>
+      <div class="dxf">${dxfB.substring(0,3000)}</div>
+      
+      <div class="pagebreak"></div>
+      
+      <h2>Export DXF — COUVERCLE</h2>
+      <div class="dxf">${dxfL.substring(0,3000)}</div>
+      
+      <div class="pagebreak"></div>
+      
+      <h2>Instructions</h2>
+      <p><strong>Fichiers DXF complets :</strong> Utilisez les boutons "Télécharger" pour obtenir les fichiers .dxf complets.</p>
+      <h3>Ordre d'usinage — BASE :</h3>
+      <ol>
+        <li>Poche (CAVITE_INT)</li>
+        <li>Fond (FOND_BALLNOSE) avec ball-nose Ø${p.bn}mm</li>
+        <li>Contour (CONTOUR_EXT) avec onglets</li>
+      </ol>
+      <h3>Ordre d'usinage — COUVERCLE :</h3>
+      <ol>
+        <li>Rainure (RAINURE_EXT → RAINURE_INT), profondeur ${p.gD}mm</li>
+        <li>Contour (CONTOUR_EXT)</li>
+      </ol>
+    </body>
+    </html>
+  `;
+  const opt={margin:10,filename:'dwgbox-projet.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2},jsPDF:{orientation:'portrait',unit:'mm',format:'a4'}};
+  html2pdf().set(opt).from(html).save();
 }
 
 update();

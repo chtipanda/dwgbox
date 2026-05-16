@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="80" fill="#185FA5"/>
+  <rect x="80" y="210" width="352" height="220" rx="20" fill="none" stroke="#fff" stroke-width="18"/>
+  <path d="M80 295 H432" stroke="#fff" stroke-width="12" stroke-dasharray="20,10"/>
+  <rect x="100" y="130" width="312" height="90" rx="14" fill="#fff" opacity="0.92"/>
+  <text x="256" y="196" text-anchor="middle" font-family="Arial,sans-serif" font-size="54" font-weight="700" fill="#185FA5">DXF</text>
+  <path d="M120 370 Q256 340 392 370" stroke="#FFD080" stroke-width="8" fill="none" stroke-dasharray="16,8"/>
+  <circle cx="120" cy="370" r="8" fill="#FFD080"/>
+  <circle cx="392" cy="370" r="8" fill="#FFD080"/>
+</svg>

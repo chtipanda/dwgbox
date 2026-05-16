@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DwgBox — Générateur de boîtes CNC en bois</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,'Times New Roman',serif;background:#faf9f6;color:#1a1a18;line-height:1.75}
+.hero{background:linear-gradient(135deg,#185FA5 0%,#0C3D6E 100%);color:#fff;padding:60px 20px 50px;text-align:center}
+.hero h1{font-size:42px;font-weight:700;letter-spacing:-.01em;margin-bottom:10px}
+.hero .sub{font-size:18px;opacity:.85;margin-bottom:24px;font-style:italic}
+.badge{display:inline-flex;align-items:center;gap:8px;background:#fff2;border:1px solid #fff4;border-radius:20px;padding:6px 16px;font-size:13px;font-family:system-ui;margin:4px}
+.hero-cta{display:inline-block;margin-top:28px;padding:14px 36px;background:#fff;color:#185FA5;border-radius:8px;font-family:system-ui;font-weight:700;font-size:16px;text-decoration:none;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:transform .15s}
+.hero-cta:hover{transform:translateY(-2px)}
+article{max-width:760px;margin:0 auto;padding:40px 24px 80px}
+h2{font-size:26px;color:#185FA5;margin:40px 0 16px;border-left:4px solid #185FA5;padding-left:14px}
+h3{font-size:18px;color:#1a1a18;margin:28px 0 10px;font-family:system-ui}
+p{margin-bottom:14px;font-size:16px}
+ul,ol{margin:0 0 14px 24px;font-size:16px}
+li{margin-bottom:6px}
+.highlight{background:#f0f6ff;border:1px solid #c8d8ee;border-radius:8px;padding:16px 20px;margin:20px 0;font-family:system-ui;font-size:14px}
+.highlight strong{color:#185FA5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+.card{background:#fff;border:1px solid #e0dfd8;border-radius:8px;padding:16px;font-family:system-ui;font-size:13px}
+.card-icon{font-size:28px;margin-bottom:8px}
+.card h4{font-size:14px;font-weight:600;margin-bottom:6px;color:#1a1a18}
+.card p{font-size:13px;color:#555;margin:0}
+code{font-family:'Courier New',monospace;background:#f0f0ea;padding:2px 6px;border-radius:3px;font-size:13px;color:#C74B00}
+.layer-table{width:100%;border-collapse:collapse;margin:16px 0;font-family:system-ui;font-size:13px}
+.layer-table th{background:#185FA5;color:#fff;padding:8px 12px;text-align:left}
+.layer-table td{padding:7px 12px;border-bottom:1px solid #e0dfd8}
+.layer-table tr:nth-child(even) td{background:#f8f7f3}
+.color-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.steps{counter-reset:steps}
+.step{counter-increment:steps;display:flex;gap:16px;margin-bottom:20px}
+.step-num{flex-shrink:0;width:32px;height:32px;background:#185FA5;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:system-ui;font-weight:700;font-size:15px}
+.step-body h4{font-size:15px;font-weight:600;margin-bottom:4px;font-family:system-ui}
+.step-body p{font-size:14px;margin:0}
+footer{background:#1a1a18;color:#888;text-align:center;padding:24px;font-family:system-ui;font-size:12px}
+footer a{color:#aaa;text-decoration:none}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.hero h1{font-size:28px}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🪵 DwgBox</h1>
+  <div class="sub">Générateur paramétrique de boîtes CNC en bois</div>
+  <div>
+    <span class="badge">📐 Export DXF AC1009</span>
+    <span class="badge">⚙️ CNC 3 axes</span>
+    <span class="badge">📶 Fonctionne hors ligne</span>
+    <span class="badge">🆓 Gratuit &amp; open source</span>
+  </div>
+  <a href="index.html" class="hero-cta">▶ Ouvrir le générateur</a>
+</div>
+
+<article>
+
+<h2>Qu'est-ce que DwgBox ?</h2>
+<p>DwgBox est une application web qui génère automatiquement les fichiers DXF nécessaires à l'usinage de boîtes en bois sur une fraiseuse CNC 3 axes. Vous saisissez vos dimensions, vos paramètres d'outil et vos préférences d'emboîtement — l'application calcule toutes les cotes et produit deux fichiers DXF prêts à importer dans votre logiciel de FAO.</p>
+
+<p>Elle répond à un besoin concret du travail du bois CNC : gérer correctement la géométrie de l'emboîtement base/couvercle, le déport de la fraise ball-nose pour le fond, et le jeu fonctionnel du couvercle — sans erreur de calcul.</p>
+
+<div class="highlight">
+  <strong>URL :</strong> <a href="https://chtipanda.github.io/dwgbox/">https://chtipanda.github.io/dwgbox/</a><br>
+  <strong>Compatible :</strong> Aspire (Vectric), CamBam, Krabscam<br>
+  <strong>Format DXF :</strong> AC1009 (AutoCAD R12) — lignes et arcs simples, sans blocs ni splines
+</div>
+
+<h2>Pourquoi cette application ?</h2>
+<p>Usiner une boîte en bois semble simple, mais plusieurs contraintes CNC se cumulent :</p>
+<ul>
+  <li>La <strong>fraise ball-nose</strong> utilisée pour le fond crée un congé de rayon R — il faut donc programmer le chemin d'outil décalé de R/2 vers l'intérieur pour que le fond soit correctement formé.</li>
+  <li>L'<strong>emboîtement base/couvercle</strong> nécessite un jeu fonctionnel précis, appliqué au bon endroit (sur le tenon, pas sur la rainure).</li>
+  <li>La <strong>rainure</strong> est prise dans l'épaisseur de la paroi — il reste un tenon dont la largeur doit être calculée et validée pour ne pas être fragile.</li>
+  <li>Les DXF doivent être en <strong>géométrie simple</strong> (lignes + arcs) pour être compatibles avec les logiciels de FAO artisanaux.</li>
+</ul>
+<p>DwgBox automatise tout ce calcul et avertit si les paramètres sont incohérents avant même de lancer la machine.</p>
+
+<h2>Fonctionnalités</h2>
+<div class="grid">
+  <div class="card"><div class="card-icon">📦</div><h4>3 formes disponibles</h4><p>Rectangulaire, ronde (cercle) et hexagonale — chacune avec calcul d'offset correct.</p></div>
+  <div class="card"><div class="card-icon">🔧</div><h4>Emboîtement paramétrable</h4><p>Recouvrement ou intérieur. Largeur et profondeur de rainure libres, jeu fonctionnel réglable.</p></div>
+  <div class="card"><div class="card-icon">🎯</div><h4>Chemin fond ball-nose</h4><p>Ligne déportée de Ø/2 automatiquement calculée et placée sur une couche dédiée.</p></div>
+  <div class="card"><div class="card-icon">⚠️</div><h4>Détection d'erreurs</h4><p>Alertes en temps réel si le tenon est trop mince, la fraise trop grande, ou le couvercle trop bas.</p></div>
+  <div class="card"><div class="card-icon">📄</div><h4>DXF multi-couches</h4><p>5 couches nommées pour assigner les stratégies d'usinage couche par couche dans votre FAO.</p></div>
+  <div class="card"><div class="card-icon">📶</div><h4>PWA hors ligne</h4><p>Installable sur PC ou mobile. Fonctionne sans connexion internet une fois chargée.</p></div>
+</div>
+
+<h2>Structure des fichiers DXF</h2>
+<p>Chaque export produit deux fichiers séparés (base et couvercle), chacun organisé en couches nommées :</p>
+
+<table class="layer-table">
+  <tr><th>Couche</th><th>Contenu</th><th>Usage FAO</th></tr>
+  <tr><td><code><span class="color-dot" style="background:#333"></span>CONTOUR_EXT</code></td><td>Contour extérieur de la pièce</td><td>Profil de découpe (côté à préciser)</td></tr>
+  <tr><td><code><span class="color-dot" style="background:#0F6E56"></span>CAVITE_INT</code></td><td>Cavité intérieure</td><td>Opération Pocket (vidage)</td></tr>
+  <tr><td><code><span class="color-dot" style="background:#BA7517"></span>FOND_BALLNOSE</code></td><td>Chemin fond déporté de Ø/2</td><td>Profil avec fraise ball-nose</td></tr>
+  <tr><td><code><span class="color-dot" style="background:#D85A30"></span>RAINURE_EXT</code></td><td>Bord extérieur de la rainure</td><td>Limite de la passe rainure</td></tr>
+  <tr><td><code><span class="color-dot" style="background:#c0392b"></span>RAINURE_INT</code></td><td>Bord intérieur de la rainure</td><td>Limite intérieure de la passe</td></tr>
+</table>
+
+<h2>Calcul de l'emboîtement</h2>
+<p>Pour une paroi de <strong>6 mm</strong>, une rainure de <strong>3 mm</strong> et un jeu de <strong>0,2 mm</strong> :</p>
+<div class="highlight">
+  Tenon effectif = e − gW − jeu = 6 − 3 − 0,2 = <strong>2,8 mm</strong><br>
+  Reste côté extérieur = e − gW = <strong>3 mm</strong><br>
+  Le jeu est appliqué côté tenon (couvercle), la rainure de la base garde ses cotes nominales.
+</div>
+
+<h2>Comment utiliser l'application</h2>
+<div class="steps">
+  <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Choisir la forme et le type d'emboîtement</h4><p>Rectangulaire, ronde ou hexagonale. Recouvrement (couvercle par-dessus) ou intérieur (tenon dans la boîte).</p></div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Saisir les dimensions extérieures</h4><p>Longueur, largeur, hauteur totale. Régler le curseur de ratio base/couvercle.</p></div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Paramétrer les outils</h4><p>Diamètre de la fraise ball-nose (fond), diamètre et côté de la fraise de contour.</p></div></div>
+  <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Définir la rainure et le jeu</h4><p>Largeur et profondeur de rainure, jeu fonctionnel. L'application affiche le tenon résultant et avertit si les cotes sont incompatibles.</p></div></div>
+  <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Télécharger les DXF</h4><p>Deux boutons : <em>boite_base.dxf</em> et <em>boite_couvercle.dxf</em>. Importer dans Aspire, CamBam ou Krabscam et assigner les stratégies par couche.</p></div></div>
+</div>
+
+<h2>Compatibilité logiciels FAO</h2>
+<ul>
+  <li><strong>Aspire (Vectric) :</strong> Fichier &gt; Importer &gt; Vecteurs DXF. Sélectionner les couches et assigner : Pocket → <code>CAVITE_INT</code>, Profile → <code>CONTOUR_EXT</code> &amp; <code>FOND_BALLNOSE</code>.</li>
+  <li><strong>CamBam :</strong> Ouvrir le .dxf directement. Sélectionner la couche et créer une opération (MachineOp) par couche.</li>
+  <li><strong>Krabscam :</strong> Import DXF, les couches sont reconnues et listées automatiquement.</li>
+</ul>
+<p>Le format DXF AC1009 (AutoCAD R12) est utilisé intentionnellement : il est le plus largement supporté par les logiciels de FAO artisanaux, sans blocs, sans polylignes LWPOLYLINE ni splines.</p>
+
+<h2>Installation en PWA (mode hors ligne)</h2>
+<p>DwgBox est une Progressive Web App. Une fois la page chargée, elle fonctionne sans connexion. Pour l'installer :</p>
+<ul>
+  <li><strong>Chrome / Edge (PC) :</strong> icône d'installation dans la barre d'adresse, ou menu ⋮ &gt; "Installer DwgBox".</li>
+  <li><strong>Safari (iPhone/iPad) :</strong> bouton Partager &gt; "Sur l'écran d'accueil".</li>
+  <li><strong>Android :</strong> bannière automatique ou menu ⋮ &gt; "Ajouter à l'écran d'accueil".</li>
+</ul>
+
+<h2>À propos</h2>
+<p>DwgBox est un projet open source développé par <a href="https://github.com/chtipanda">chtipanda</a>, passionné de CNC et de travail du bois. Il est hébergé gratuitement sur GitHub Pages.</p>
+<p>Le code source est disponible sur <a href="https://github.com/chtipanda/dwgbox">github.com/chtipanda/dwgbox</a>.</p>
+
+</article>
+
+<footer>
+  DwgBox — <a href="index.html">Ouvrir l'application</a> · <a href="https://github.com/chtipanda/dwgbox">GitHub</a> · Hébergé sur GitHub Pages
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" rx="32" fill="#185FA5"/>
+  <!-- Boîte ouverte -->
+  <rect x="32" y="80" width="128" height="80" rx="8" fill="none" stroke="#fff" stroke-width="8"/>
+  <path d="M32 110 H160" stroke="#fff" stroke-width="5" stroke-dasharray="8,4"/>
+  <!-- Couvercle -->
+  <rect x="40" y="50" width="112" height="36" rx="6" fill="#fff" opacity="0.9"/>
+  <!-- Lettres DXF -->
+  <text x="96" y="76" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#185FA5">DXF</text>
+  <!-- Trait ball-nose -->
+  <path d="M52 140 Q96 130 140 140" stroke="#FFD080" stroke-width="3" fill="none" stroke-dasharray="6,3"/>
+</svg>

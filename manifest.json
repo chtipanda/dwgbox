@@ -1,0 +1,28 @@
+{
+  "name": "DwgBox — Générateur Boîte CNC",
+  "short_name": "DwgBox",
+  "description": "Générateur paramétrique de boîtes en bois pour CNC 3 axes. Export DXF compatible Aspire, CamBam, Krabscam.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f4f0",
+  "theme_color": "#185FA5",
+  "lang": "fr",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "screenshots": []
+}

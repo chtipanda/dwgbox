@@ -83,12 +83,161 @@ button.p:hover{background:#0C447C}
           </select>
         </div>
         <div class="f"><label>Emboîtement</label>
-          <select id="fitType">
+          <select id="fitType" onchange="updateFitPicto()">
             <option value="overlay">Recouvrement</option>
-            <option value="inner">Intérieur</option>
+            <option value="inner">Intérieur (tenon)</option>
+            <option value="shext">Épaulement externe</option>
+            <option value="shint">Épaulement interne</option>
           </select>
         </div>
       </div>
+
+      <!-- Pictogrammes emboîtement — vue en coupe (profil) -->
+      <div id="fitPicto" style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+
+        <!-- 1. Recouvrement — coupe -->
+        <div id="picto-overlay" style="text-align:center;transition:opacity .2s">
+          <svg viewBox="0 0 100 80" width="100%" style="display:block;max-width:120px;margin:0 auto">
+            <defs><marker id="a1" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4Z" fill="#185FA5"/></marker></defs>
+            <!-- COUVERCLE : paroi gauche ext qui descend et englobe -->
+            <!-- paroi ext gauche couvercle -->
+            <line x1="20" y1="8" x2="20" y2="48" stroke="#185FA5" stroke-width="2"/>
+            <!-- dessus couvercle -->
+            <line x1="20" y1="8" x2="80" y2="8" stroke="#185FA5" stroke-width="2"/>
+            <!-- paroi int gauche couvercle (avec rainure) -->
+            <line x1="32" y1="8" x2="32" y2="34" stroke="#185FA5" stroke-width="1.5"/>
+            <!-- fond de rainure -->
+            <line x1="20" y1="34" x2="32" y2="34" stroke="#185FA5" stroke-width="1.5"/>
+            <!-- bas couvercle paroi ext -->
+            <line x1="20" y1="48" x2="32" y2="48" stroke="#185FA5" stroke-width="2"/>
+            <!-- label -->
+            <text x="56" y="22" font-size="6.5" fill="#185FA5" font-family="system-ui" font-weight="600">COUVERCLE</text>
+            <!-- BASE : paroi gauche -->
+            <line x1="32" y1="48" x2="32" y2="72" stroke="#555" stroke-width="2"/>
+            <!-- dessus base -->
+            <line x1="32" y1="48" x2="80" y2="48" stroke="#555" stroke-width="1.5"/>
+            <!-- bas base -->
+            <line x1="20" y1="72" x2="80" y2="72" stroke="#555" stroke-width="2"/>
+            <!-- paroi ext base -->
+            <line x1="20" y1="48" x2="20" y2="72" stroke="#555" stroke-width="2"/>
+            <!-- paroi int base -->
+            <line x1="44" y1="48" x2="44" y2="72" stroke="#0F6E56" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="62" y="63" font-size="6.5" fill="#555" font-family="system-ui" font-weight="600">BASE</text>
+            <!-- jeu flèche -->
+            <line x1="26" y1="52" x2="26" y2="44" stroke="#E04" stroke-width="0.8" marker-end="url(#a1)"/>
+            <text x="34" y="44" font-size="5.5" fill="#E04" font-family="system-ui">jeu</text>
+          </svg>
+          <div style="font-size:10px;color:#185FA5;font-weight:600;margin-top:2px">Recouvrement</div>
+          <div style="font-size:9px;color:#777;line-height:1.3">Couvercle englobe<br>la base par-dessus</div>
+        </div>
+
+        <!-- 2. Intérieur / tenon — coupe -->
+        <div id="picto-inner" style="text-align:center;opacity:0.35;transition:opacity .2s">
+          <svg viewBox="0 0 100 80" width="100%" style="display:block;max-width:120px;margin:0 auto">
+            <defs><marker id="a2" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4Z" fill="#E04"/></marker></defs>
+            <!-- COUVERCLE plat + tenon saillant en dessous -->
+            <!-- dessus couvercle -->
+            <line x1="20" y1="8" x2="80" y2="8" stroke="#185FA5" stroke-width="2"/>
+            <!-- paroi ext gauche couvercle -->
+            <line x1="20" y1="8" x2="20" y2="22" stroke="#185FA5" stroke-width="2"/>
+            <!-- bas paroi ext couvercle -->
+            <line x1="20" y1="22" x2="32" y2="22" stroke="#185FA5" stroke-width="2"/>
+            <!-- tenon : paroi gauche -->
+            <line x1="32" y1="22" x2="32" y2="38" stroke="#185FA5" stroke-width="1.5"/>
+            <!-- bas tenon -->
+            <line x1="32" y1="38" x2="44" y2="38" stroke="#185FA5" stroke-width="1.5"/>
+            <!-- paroi int couvercle -->
+            <line x1="44" y1="8" x2="44" y2="38" stroke="#185FA5" stroke-width="1.5"/>
+            <text x="55" y="18" font-size="6.5" fill="#185FA5" font-family="system-ui" font-weight="600">COUV.</text>
+            <text x="34" y="33" font-size="5.5" fill="#185FA5" font-family="system-ui">tenon</text>
+            <!-- BASE avec cavité pour recevoir le tenon -->
+            <line x1="20" y1="42" x2="80" y2="42" stroke="#555" stroke-width="2"/><!-- dessus base -->
+            <line x1="20" y1="42" x2="20" y2="72" stroke="#555" stroke-width="2"/><!-- ext gauche -->
+            <line x1="20" y1="72" x2="80" y2="72" stroke="#555" stroke-width="2"/><!-- bas -->
+            <!-- marche épaulement dans base pour recevoir tenon -->
+            <line x1="32" y1="42" x2="32" y2="50" stroke="#555" stroke-width="1.5"/>
+            <line x1="32" y1="50" x2="44" y2="50" stroke="#555" stroke-width="1.5"/>
+            <line x1="44" y1="42" x2="44" y2="72" stroke="#0F6E56" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="56" y="62" font-size="6.5" fill="#555" font-family="system-ui" font-weight="600">BASE</text>
+            <!-- jeu -->
+            <line x1="38" y1="41" x2="38" y2="37" stroke="#E04" stroke-width="0.8" marker-end="url(#a2)"/>
+            <text x="43" y="37" font-size="5.5" fill="#E04" font-family="system-ui">jeu</text>
+          </svg>
+          <div style="font-size:10px;color:#185FA5;font-weight:600;margin-top:2px">Intérieur (tenon)</div>
+          <div style="font-size:9px;color:#777;line-height:1.3">Tenon du couvercle<br>dans la base</div>
+        </div>
+
+        <!-- 3. Épaulement externe — coupe (marche dans la BASE, couvercle plat par-dessus) -->
+        <div id="picto-shext" style="text-align:center;opacity:0.35;transition:opacity .2s">
+          <svg viewBox="0 0 100 80" width="100%" style="display:block;max-width:120px;margin:0 auto">
+            <defs><marker id="a3" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4Z" fill="#E04"/></marker></defs>
+            <!-- COUVERCLE plat simple (pas de tenon, pas de rainure) -->
+            <line x1="20" y1="8" x2="80" y2="8" stroke="#185FA5" stroke-width="2"/>
+            <line x1="20" y1="8" x2="20" y2="30" stroke="#185FA5" stroke-width="2"/>
+            <line x1="20" y1="30" x2="80" y2="30" stroke="#185FA5" stroke-width="2"/>
+            <text x="50" y="22" font-size="6.5" fill="#185FA5" font-family="system-ui" font-weight="600" text-anchor="middle">COUVERCLE plat</text>
+            <!-- BASE avec épaulement taillé dans le bord sup -->
+            <!-- paroi ext gauche base -->
+            <line x1="20" y1="36" x2="20" y2="72" stroke="#555" stroke-width="2"/>
+            <!-- bas base -->
+            <line x1="20" y1="72" x2="80" y2="72" stroke="#555" stroke-width="2"/>
+            <!-- bord sup ext base -->
+            <line x1="20" y1="36" x2="32" y2="36" stroke="#555" stroke-width="2"/>
+            <!-- marche verticale (épaulement) -->
+            <line x1="32" y1="36" x2="32" y2="48" stroke="#555" stroke-width="2"/>
+            <!-- palier horizontal (surface d'appui épaulement) -->
+            <line x1="32" y1="48" x2="80" y2="48" stroke="#555" stroke-width="2"/>
+            <!-- paroi int base -->
+            <line x1="44" y1="48" x2="44" y2="72" stroke="#0F6E56" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="62" y="63" font-size="6.5" fill="#555" font-family="system-ui" font-weight="600">BASE</text>
+            <!-- annotations épaulement -->
+            <text x="34" y="44" font-size="5.5" fill="#D85A30" font-family="system-ui">épaulement</text>
+            <!-- jeu entre couvercle et épaulement -->
+            <line x1="26" y1="31" x2="26" y2="37" stroke="#E04" stroke-width="0.8" marker-end="url(#a3)"/>
+            <text x="28" y="37" font-size="5.5" fill="#E04" font-family="system-ui">jeu</text>
+          </svg>
+          <div style="font-size:10px;color:#185FA5;font-weight:600;margin-top:2px">Épaulement externe</div>
+          <div style="font-size:9px;color:#777;line-height:1.3">Marche dans la base,<br>couvercle plat dessus</div>
+        </div>
+
+        <!-- 4. Épaulement interne — coupe (marche dans le COUVERCLE, s'insère dans la base) -->
+        <div id="picto-shint" style="text-align:center;opacity:0.35;transition:opacity .2s">
+          <svg viewBox="0 0 100 80" width="100%" style="display:block;max-width:120px;margin:0 auto">
+            <defs><marker id="a4" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto"><path d="M0,0 L4,2 L0,4Z" fill="#E04"/></marker></defs>
+            <!-- COUVERCLE avec épaulement taillé sur son bord inférieur -->
+            <line x1="20" y1="8" x2="80" y2="8" stroke="#185FA5" stroke-width="2"/><!-- dessus -->
+            <line x1="20" y1="8" x2="20" y2="30" stroke="#185FA5" stroke-width="2"/><!-- ext gauche -->
+            <!-- marche du couvercle : palier ext -->
+            <line x1="20" y1="30" x2="32" y2="30" stroke="#185FA5" stroke-width="2"/>
+            <!-- marche verticale -->
+            <line x1="32" y1="30" x2="32" y2="42" stroke="#185FA5" stroke-width="2"/>
+            <!-- bas insert (bord inf int couvercle) -->
+            <line x1="32" y1="42" x2="80" y2="42" stroke="#185FA5" stroke-width="2"/>
+            <!-- paroi int couvercle -->
+            <line x1="44" y1="8" x2="44" y2="42" stroke="#185FA5" stroke-width="1.5"/>
+            <text x="50" y="20" font-size="6.5" fill="#185FA5" font-family="system-ui" font-weight="600" text-anchor="middle">COUVERCLE</text>
+            <text x="34" y="38" font-size="5.5" fill="#D85A30" font-family="system-ui">épaulement</text>
+            <!-- BASE paroi droite simple -->
+            <line x1="20" y1="42" x2="20" y2="72" stroke="#555" stroke-width="2"/><!-- ext gauche base -->
+            <line x1="20" y1="72" x2="80" y2="72" stroke="#555" stroke-width="2"/><!-- bas -->
+            <!-- bord sup base int -->
+            <line x1="32" y1="42" x2="32" y2="72" stroke="#555" stroke-width="2"/><!-- paroi int base -->
+            <!-- dessus base visible ext -->
+            <line x1="20" y1="42" x2="32" y2="42" stroke="#555" stroke-width="2"/>
+            <!-- cavité base -->
+            <line x1="44" y1="42" x2="44" y2="72" stroke="#0F6E56" stroke-width="1.2" stroke-dasharray="3,2"/>
+            <text x="62" y="60" font-size="6.5" fill="#555" font-family="system-ui" font-weight="600">BASE</text>
+            <!-- jeu -->
+            <line x1="26" y1="41" x2="26" y2="43" stroke="#E04" stroke-width="0.8"/>
+            <line x1="24" y1="42" x2="28" y2="42" stroke="#E04" stroke-width="0.8"/>
+            <text x="29" y="41" font-size="5.5" fill="#E04" font-family="system-ui">jeu</text>
+          </svg>
+          <div style="font-size:10px;color:#185FA5;font-weight:600;margin-top:2px">Épaulement interne</div>
+          <div style="font-size:9px;color:#777;line-height:1.3">Marche dans le couvercle,<br>s'insère dans la base</div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 
@@ -230,8 +379,16 @@ function gp(){
   };
 }
 
+function updateFitPicto(){
+  const v=document.getElementById('fitType').value;
+  ['overlay','inner','shext','shint'].forEach(k=>{
+    document.getElementById('picto-'+k).style.opacity=v===k?'1':'0.35';
+  });
+}
+
 function update(){
   const p=gp();
+  updateFitPicto();
   const fw2=document.getElementById('fw2');
   const lbl1=document.getElementById('lbl1');
   if(p.shape==='round'){fw2.style.display='none';lbl1.textContent='Diamètre (D)';}
@@ -245,12 +402,16 @@ function update(){
 
   const tenonMur=+(p.e-p.gW-p.gap).toFixed(2);
   const resteExt=+(p.e-p.gW).toFixed(2);
+  const fitDesc={
+    overlay:'Recouvrement : le couvercle englobe la base par-dessus — rainure usinée dans sa face intérieure.',
+    inner:'Intérieur (tenon) : le tenon du couvercle s\'insère dans le creux usiné de la base.',
+    shext:'Épaulement externe : marche usinée dans la base — le couvercle plat repose dessus par l\'extérieur.',
+    shint:'Épaulement interne : marche usinée dans le couvercle — s\'insère dans la paroi intérieure de la base.'
+  };
   document.getElementById('fitCalc').innerHTML=
     `Paroi <b>${p.e} mm</b> = rainure <b>${p.gW} mm</b> + reste ext. <b>${resteExt} mm</b><br>
      Tenon effectif = e − gW − jeu = <b>${tenonMur} mm</b><br>
-     ${p.fitType==='overlay'
-       ?'Recouvrement : couvercle englobe la boîte, rainure dans face intérieure.'
-       :'Intérieur : tenon rentre de '+p.gW+'mm dans la cavité de la base.'}`;
+     ${fitDesc[p.fitType]||''}`;
 
   const warns=[];
   if(tenonMur<1) warns.push(`Tenon trop mince (${tenonMur} mm) — augmenter e ou réduire gW/jeu`);
@@ -307,15 +468,27 @@ function draw(id,p,isLid){
       rr(e,e,Lv-2*e,Wv-2*e,cGreen,1);
       const off=p.bn/2;
       rr(e+off,e+off,Lv-2*(e+off),Wv-2*(e+off),cAmber,0.8,[4,3]);
+      if(p.fitType==='shext'){
+        rr(e-gW,e-gW,Lv-2*(e-gW),Wv-2*(e-gW),cOrange,1.5);
+        rr(e+gap,e+gap,Lv-2*(e+gap),Wv-2*(e+gap),cOrange,1,[3,2]);
+      }
     }else{
       if(p.fitType==='overlay'){
         rr(0,0,Lv,Wv,cBlue,1.5);
         rr(e-gW,e-gW,Lv-2*(e-gW),Wv-2*(e-gW),cOrange,1.5);
         rr(e,e,Lv-2*e,Wv-2*e,cOrange,1);
-      }else{
+      }else if(p.fitType==='inner'){
         const tO=e-gW-gap;
         rr(tO,tO,Lv-2*tO,Wv-2*tO,cBlue,1.5);
         rr(e-gap,e-gap,Lv-2*(e-gap),Wv-2*(e-gap),cOrange,1.2);
+      }else if(p.fitType==='shext'){
+        // couvercle plat : juste contour
+        rr(0,0,Lv,Wv,cBlue,1.5);
+      }else{
+        // shint : épaulement dans le couvercle
+        rr(0,0,Lv,Wv,cBlue,1.5);
+        rr(e-gW,e-gW,Lv-2*(e-gW),Wv-2*(e-gW),cOrange,1.5);
+        rr(e-gW+gap,e-gW+gap,Lv-2*(e-gW+gap),Wv-2*(e-gW+gap),cOrange,1,[3,2]);
       }
     }
   }else if(p.shape==='round'){
@@ -327,10 +500,14 @@ function draw(id,p,isLid){
       if(dash)ctx.setLineDash(dash);else ctx.setLineDash([]);
       ctx.beginPath();ctx.arc(cxc,cyc,r*sc,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
     }
-    if(!isLid){cc(R,cBlue,1.5);cc(R-e,cGreen,1);cc(R-e-p.bn/2,cAmber,0.8,[4,3]);}
-    else{
+    if(!isLid){
+      cc(R,cBlue,1.5);cc(R-e,cGreen,1);cc(R-e-p.bn/2,cAmber,0.8,[4,3]);
+      if(p.fitType==='shext'){cc(R-(e-gW),cOrange,1.5);cc(R-(e+gap),cOrange,1,[3,2]);}
+    }else{
       if(p.fitType==='overlay'){cc(R,cBlue,1.5);cc(R-(e-gW),cOrange,1.5);cc(R-e,cOrange,1);}
-      else{cc(R-(e-gW-gap),cBlue,1.5);cc(R-(e-gap),cOrange,1.2);}
+      else if(p.fitType==='inner'){cc(R-(e-gW-gap),cBlue,1.5);cc(R-(e-gap),cOrange,1.2);}
+      else if(p.fitType==='shext'){cc(R,cBlue,1.5);}
+      else{cc(R,cBlue,1.5);cc(R-(e-gW),cOrange,1.5);cc(R-(e-gW+gap),cOrange,1,[3,2]);}
     }
   }else if(p.shape==='hex'){
     const R=p.L/2;
@@ -343,10 +520,14 @@ function draw(id,p,isLid){
       for(let i=0;i<6;i++){const a=Math.PI/3*i-Math.PI/6;ctx.lineTo(cxh+r*sc*Math.cos(a),cyh+r*sc*Math.sin(a));}
       ctx.closePath();ctx.stroke();ctx.setLineDash([]);
     }
-    if(!isLid){hx(R,cBlue,1.5);hx(R-e,cGreen,1);hx(R-e-p.bn/2,cAmber,0.8,[4,3]);}
-    else{
+    if(!isLid){
+      hx(R,cBlue,1.5);hx(R-e,cGreen,1);hx(R-e-p.bn/2,cAmber,0.8,[4,3]);
+      if(p.fitType==='shext'){hx(R-(e-gW),cOrange,1.5);hx(R-(e+gap),cOrange,1,[3,2]);}
+    }else{
       if(p.fitType==='overlay'){hx(R,cBlue,1.5);hx(R-(e-gW),cOrange,1.5);hx(R-e,cOrange,1);}
-      else{hx(R-(e-gW-gap),cBlue,1.5);hx(R-(e-gap),cOrange,1.2);}
+      else if(p.fitType==='inner'){hx(R-(e-gW-gap),cBlue,1.5);hx(R-(e-gap),cOrange,1.2);}
+      else if(p.fitType==='shext'){hx(R,cBlue,1.5);}
+      else{hx(R,cBlue,1.5);hx(R-(e-gW),cOrange,1.5);hx(R-(e-gW+gap),cOrange,1,[3,2]);}
     }
   }
   ctx.font='10px system-ui';ctx.fillStyle='#888';
@@ -384,30 +565,51 @@ function buildDXF(p,isLid){
       body+=rectDXF(0,0,Lv,Wv,'CONTOUR_EXT');
       body+=rectDXF(e,e,Lv-2*e,Wv-2*e,'CAVITE_INT');
       body+=rectDXF(e+bn/2,e+bn/2,Lv-2*(e+bn/2),Wv-2*(e+bn/2),'FOND_BALLNOSE');
+      if(p.fitType==='shext'){
+        // Épaulement externe usiné dans le bord sup de la base
+        body+=rectDXF(e-gW,e-gW,Lv-2*(e-gW),Wv-2*(e-gW),'RAINURE_EXT');// bord ext épaulement
+        body+=rectDXF(e+gap,e+gap,Lv-2*(e+gap),Wv-2*(e+gap),'RAINURE_INT');// bord int épaulement (surface d'appui)
+      }
     }else{
       if(p.fitType==='overlay'){
         body+=rectDXF(0,0,Lv,Wv,'CONTOUR_EXT');
         body+=rectDXF(e-gW,e-gW,Lv-2*(e-gW),Wv-2*(e-gW),'RAINURE_EXT');
         body+=rectDXF(e,e,Lv-2*e,Wv-2*e,'RAINURE_INT');
-      }else{
+      }else if(p.fitType==='inner'){
         const tO=e-gW-gap;
         body+=rectDXF(tO,tO,Lv-2*tO,Wv-2*tO,'CONTOUR_EXT');
         body+=rectDXF(e-gap,e-gap,Lv-2*(e-gap),Wv-2*(e-gap),'RAINURE_INT');
+      }else if(p.fitType==='shext'){
+        // Épaulement externe : couvercle plat — juste le contour extérieur
+        body+=rectDXF(0,0,Lv,Wv,'CONTOUR_EXT');
+      }else{
+        // Épaulement interne : marche dans le couvercle
+        body+=rectDXF(0,0,Lv,Wv,'CONTOUR_EXT');
+        body+=rectDXF(e-gW,e-gW,Lv-2*(e-gW),Wv-2*(e-gW),'RAINURE_EXT'); // bord ext épaulement
+        body+=rectDXF(e-gW+gap,e-gW+gap,Lv-2*(e-gW+gap),Wv-2*(e-gW+gap),'RAINURE_INT'); // bord int avec jeu
       }
     }
   }else if(p.shape==='round'){
     const R=p.L/2;
-    if(!isLid){body+=Ci(0,0,R,'CONTOUR_EXT');body+=Ci(0,0,R-e,'CAVITE_INT');body+=Ci(0,0,R-e-bn/2,'FOND_BALLNOSE');}
-    else{
+    if(!isLid){
+      body+=Ci(0,0,R,'CONTOUR_EXT');body+=Ci(0,0,R-e,'CAVITE_INT');body+=Ci(0,0,R-e-bn/2,'FOND_BALLNOSE');
+      if(p.fitType==='shext'){body+=Ci(0,0,R-(e-gW),'RAINURE_EXT');body+=Ci(0,0,R-(e+gap),'RAINURE_INT');}
+    }else{
       if(p.fitType==='overlay'){body+=Ci(0,0,R,'CONTOUR_EXT');body+=Ci(0,0,R-(e-gW),'RAINURE_EXT');body+=Ci(0,0,R-e,'RAINURE_INT');}
-      else{body+=Ci(0,0,R-(e-gW-gap),'CONTOUR_EXT');body+=Ci(0,0,R-(e-gap),'RAINURE_INT');}
+      else if(p.fitType==='inner'){body+=Ci(0,0,R-(e-gW-gap),'CONTOUR_EXT');body+=Ci(0,0,R-(e-gap),'RAINURE_INT');}
+      else if(p.fitType==='shext'){body+=Ci(0,0,R,'CONTOUR_EXT');}
+      else{body+=Ci(0,0,R,'CONTOUR_EXT');body+=Ci(0,0,R-(e-gW),'RAINURE_EXT');body+=Ci(0,0,R-(e-gW+gap),'RAINURE_INT');}
     }
   }else if(p.shape==='hex'){
     const R=p.L/2;
-    if(!isLid){body+=hexDXF(0,0,R,'CONTOUR_EXT');body+=hexDXF(0,0,R-e,'CAVITE_INT');body+=hexDXF(0,0,R-e-bn/2,'FOND_BALLNOSE');}
-    else{
+    if(!isLid){
+      body+=hexDXF(0,0,R,'CONTOUR_EXT');body+=hexDXF(0,0,R-e,'CAVITE_INT');body+=hexDXF(0,0,R-e-bn/2,'FOND_BALLNOSE');
+      if(p.fitType==='shext'){body+=hexDXF(0,0,R-(e-gW),'RAINURE_EXT');body+=hexDXF(0,0,R-(e+gap),'RAINURE_INT');}
+    }else{
       if(p.fitType==='overlay'){body+=hexDXF(0,0,R,'CONTOUR_EXT');body+=hexDXF(0,0,R-(e-gW),'RAINURE_EXT');body+=hexDXF(0,0,R-e,'RAINURE_INT');}
-      else{body+=hexDXF(0,0,R-(e-gW-gap),'CONTOUR_EXT');body+=hexDXF(0,0,R-(e-gap),'RAINURE_INT');}
+      else if(p.fitType==='inner'){body+=hexDXF(0,0,R-(e-gW-gap),'CONTOUR_EXT');body+=hexDXF(0,0,R-(e-gap),'RAINURE_INT');}
+      else if(p.fitType==='shext'){body+=hexDXF(0,0,R,'CONTOUR_EXT');}
+      else{body+=hexDXF(0,0,R,'CONTOUR_EXT');body+=hexDXF(0,0,R-(e-gW),'RAINURE_EXT');body+=hexDXF(0,0,R-(e-gW+gap),'RAINURE_INT');}
     }
   }
   return dxfHdr(isLid?'COUVERCLE':'BASE')+body+dxfFtr();
@@ -425,7 +627,7 @@ function genNotice(p){
 https://chtipanda.github.io/dwgbox/
 
 Forme         : ${p.shape==='rect'?'Rectangulaire':p.shape==='round'?'Ronde':'Hexagonale'}
-Emboîtement   : ${p.fitType==='overlay'?'Recouvrement':'Intérieur'}
+Emboîtement   : ${{overlay:'Recouvrement',inner:'Intérieur (tenon)',shext:'Épaulement externe',shint:'Épaulement interne'}[p.fitType]||p.fitType}
 Dimensions    : ${p.L} × ${p.shape==='rect'?p.W:p.L} × ${p.H} mm
 Épaisseur     : ${p.e} mm
 
